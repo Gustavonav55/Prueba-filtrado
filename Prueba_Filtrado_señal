@@ -1,0 +1,48 @@
+import testset as sigs
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy.fftpack import fft,ifft
+from scipy import signal
+
+x1=sigs.prueba_Dataset
+plt.plot(x1)
+
+freq_domain_signal = fft(prueba_Dataset)
+plt.stem(freq_domain_signal)
+plt.xlim(0,100)
+plt.show()
+
+signal_prueba=np.zeros(len(sigs.prueba_Dataset))
+
+#normalizar la señal de entrada
+for i,num in enumerate (sigs.prueba_Dataset):
+    signal_prueba[i]=float(sigs.prueba_Dataset[i]/max(sigs.prueba_Dataset))
+
+#grafica normalizada
+plt.plot(signal_prueba)
+plt.show()    
+
+#filtro pasa bajo
+lowpass_filter = signal.bessel(10,60, 'lp', fs=1200,analog=False, output='sos')
+filtered=signal.sosfilt(lowpass_filter,signal_prueba)
+
+f,plt_arr=plt.subplots(2,sharex=True)
+f.suptitle("Filtro FIR")
+plt_arr[0].plot(signal_prueba,color='blue')
+plt_arr[0].set_title('señal de entrada ecg_100Hz')
+plt_arr[1].plot(filtered,color='red')
+plt_arr[1].set_title('señal filtrada pasa bajos 40Hz')
+
+##Ruido de la señal
+highpassbessel = signal.bessel(5, 120,'hp', fs=1200,analog=False, output='sos')
+filtered=signal.sosfilt(highpassbessel,signal_prueba)
+
+f,plt_arr=plt.subplots(2,sharex=True)
+f.suptitle("Filtro IIR")
+plt_arr[0].plot(signal_prueba,color='blue')
+plt_arr[0].set_title('señal de entrada ecg_100Hz')
+plt_arr[1].plot(filtered,color='red')
+plt_arr[1].set_title('señal filtrada pasa altos 30Hz')
+
+
+
